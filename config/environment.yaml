@@ -1,0 +1,21 @@
+user:
+  yangyang1:
+    username: 18322369885
+    password: YANGyang022
+  yangyang2:
+    username: 15620849885
+    password: YANGyang022
+
+management:
+  test1:
+    uesrname: test
+    password: $Nbiud8po23%yf*F
+
+
+url: https://bss-front-uat.sixents.com
+managementUrl: https://bss-backend-uat.sixents.com/login
+
+redis:
+  host: 192.168.0.104
+  port: 6379
+  db: 0
