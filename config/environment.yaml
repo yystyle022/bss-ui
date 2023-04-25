@@ -15,6 +15,15 @@ management:
 url: https://bss-front-uat.sixents.com
 managementUrl: https://bss-backend-uat.sixents.com/login
 
+mysql:
+  uat:
+    host: bj-cdb-b5o7vu30.sql.tencentcdb.com
+    port: 60507
+    username: qa_zhangning
+    password: vGT&MVC2h3A6@MLP
+    datebase: bss
+
+
 redis:
   host: 192.168.0.104
   port: 6379

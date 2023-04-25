@@ -30,7 +30,13 @@ class TestLogin():
             LoginPage().login(driver, url, username, password)
             # driver.quit()
 
-    @allure.story('登录管理端')
-    @allure.description('登录管理端')
-    def test_login_management(self, driver):
-
+    # @allure.story('登录管理端')
+    # @allure.description('登录管理端')
+    # def test_login_management(self, driver, managementUrl, managementUser, managementPwd):
+    #     '''
+    #     管理端登录
+    #     @param driver:
+    #     @return:
+    #     '''
+    #     with allure.step('登录'):
+    #         LoginPage().login_management(driver, managementUrl, managementUser, managementPwd)

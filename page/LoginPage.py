@@ -53,6 +53,16 @@ class LoginPage():
         assert ObjectMap().element_appear(driver, locateType='xpath', locateValue=successLoginXpath,
                                           timeout=5), "未进入首页，登录失败"
 
+    def assert_management_login_success(self, driver):
+        '''
+        验证管理端登录成功
+        @param driver:
+        @return:
+        '''
+        managementSuccessLoginXpath = LoginBase().managementLoginSuccessXpath()
+        assert ObjectMap().element_appear(driver, locateType='xpath', locateValue=managementSuccessLoginXpath,
+                                          timeout=5)
+
     def login(self, driver, url, username, password):
         '''
         登录客户端
@@ -108,4 +118,4 @@ class LoginPage():
             log.info('点击登录按钮')
             add_img_to_report(driver, '点击登录按钮')
             sleep(3)
-
+            self.assert_management_login_success(driver)

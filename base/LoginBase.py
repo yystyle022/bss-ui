@@ -62,3 +62,10 @@ class LoginBase:
         @return:
         '''
         return "//a[contains(text(),'{}')]".format(username)
+
+    def managementLoginSuccessXpath(self):
+        '''
+        管理端登陆成功Xpath
+        @return:
+        '''
+        return "//span[text()='财务管理']"
