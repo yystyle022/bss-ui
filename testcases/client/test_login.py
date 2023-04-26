@@ -13,7 +13,7 @@ from page.SliderVerificationPage import SliderVerificationPage
 from common.report_add_img import add_img_to_report
 
 
-@allure.feature('登录客户端验证')
+@allure.feature('客户端登录验证')
 class TestLogin():
     @allure.story('登录客户端')
     @allure.description('登录客户端')

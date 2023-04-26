@@ -61,7 +61,7 @@ class LoginPage():
         '''
         managementSuccessLoginXpath = LoginBase().managementLoginSuccessXpath()
         assert ObjectMap().element_appear(driver, locateType='xpath', locateValue=managementSuccessLoginXpath,
-                                          timeout=5)
+                                          timeout=5),"未进入首页，登录失败"
 
     def login(self, driver, url, username, password):
         '''
