@@ -1,8 +1,6 @@
 import time
 from time import sleep
 
-from selenium.common import ElementNotVisibleException
-
 
 class ObjectMap:
     def element_appear(self, driver, locateType, locateValue, timeout=5):
