@@ -10,7 +10,7 @@ import random
 import requests
 import numpy as np
 from selenium import webdriver
-from base.LoginBase import LoginBase
+from base.ClientLoginBase import LoginBase
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from config.driver_config import DriverConfig

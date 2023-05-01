@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import socket
-import json
 
 import pymysql
-import sock as sock
 from time import sleep
-from apiCheckServerNumber.gga_generator import gen_ntriplogin
-from apiCheckServerNumber.unpassword import AES_ENCRYPT
+from common.gga_generator import gen_ntriplogin
+from common.unpassword import AES_ENCRYPT
 
 conn = pymysql.connect(host='bj-cdb-9lx1unfs.sql.tencentcdb.com', port=61861, user='qatmp', password='P&JGRL#VJ6uq',db='poseidon')
 cursor = conn.cursor()

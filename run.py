@@ -10,6 +10,6 @@ if __name__ == '__main__':
     # os.system('allure serve ./result/')
     # 生成report报告文件
     os.system('{} generate {} -o ./report/ --clean'.format(
-        #os.path.join(r'D:\python3.10.10\Scripts\allure-2.13.2\bin\allure.bat'),
+        #os.path.join(r'D:\python3.10.10\Scripts\allure-2.13.2\bin\allure.bat')git ,
         os.path.join(r'D:\python3.8\Scripts\allure-2.13.2\bin\allure.bat'),
         os.path.join(os.getcwd(), 'result')))

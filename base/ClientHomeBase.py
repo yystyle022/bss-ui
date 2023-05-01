@@ -1,7 +1,7 @@
 # -*- coding=utf-8 -*-
 # @Time : 2023/3/17 16:50
 # @Author : yangyang
-# @File : UI/HomeBase.py
+# @File : UI/ClientHomeBase.py
 
 class HomeBase:
 

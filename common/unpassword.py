@@ -6,7 +6,7 @@ from Crypto.Cipher import AES
 
 from urllib import parse
 
-from dbutils.persistent_db import PersistentDB
+# from dbutils.persistent_db import PersistentDB
 
 AES_SECRET_KEY = 's%o1d$spACsl@a#a'  # 此处16|24|32个字符
 IV = "037%0$9V0(92&3*0"

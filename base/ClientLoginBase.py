@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Time : 2023/3/14 21:51
 # @Author : yangyang
-# @File : UI/LoginBase.py
+# @File : UI/ClientLoginBase.py
 class LoginBase:
 
     def loginInputXpath(self, input_placeholder):

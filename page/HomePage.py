@@ -3,7 +3,7 @@
 # @Author : yangyang
 # @File : UI/HomePage.py
 
-from base.HomeBase import HomeBase
+from base.ClientHomeBase import HomeBase
 
 
 class HomePage():
