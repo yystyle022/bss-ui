@@ -45,10 +45,10 @@ if __name__ == '__main__':
 
 
     # e = aes_encrypt.encrypt(password)
-    # e=b'Hrd89MXOLockGOrpeW1uwg=='
+    e=b'Hrd89MXOLockGOrpeW1uwg=='
     # d = aes_encrypt.decrypt(e)
-    print(password.encode('utf-8'))
+    # print(password.encode('utf-8'))
     # print(e)
-    # print(e.decode('utf-8'))
+    print(e.decode('utf-8'))
     # print(d)
     # print(d.decode('utf-8'))
