@@ -9,5 +9,5 @@ import pytest
 from page.ObjectMap import ObjectMap
 from page.HomePage import HomePage
 from page.LoginPage import LoginPage
-from page.SliderVerificationPage import SliderVerificationPage
+from page.ClientSliderVerificationPage import SliderVerificationPage
 from common.report_add_img import add_img_to_report

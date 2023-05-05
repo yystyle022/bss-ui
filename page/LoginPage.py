@@ -10,7 +10,7 @@ from page.HomePage import HomePage
 from page.ObjectMap import ObjectMap
 from base.ClientLoginBase import LoginBase
 from logs.log_config import log
-from page.SliderVerificationPage import SliderVerificationPage
+from page.ClientSliderVerificationPage import SliderVerificationPage
 from common.report_add_img import add_img_to_report
 
 

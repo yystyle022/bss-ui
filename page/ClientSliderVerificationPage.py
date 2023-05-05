@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Time : 2023/3/26 22:30
 # @Author : yangyang
-# @File : 2222/SliderVerificationPage.py
+# @File : 2222/ClientSliderVerificationPage.py
 import json
 import os
 import cv2
@@ -19,7 +19,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 
 
-class SliderVerificationPage():
+class ClientSliderVerificationPage():
 
     def onload_save_img(self, url, file_path):
         '''
@@ -81,8 +81,8 @@ class SliderVerificationPage():
         # 下载验证码背景图,滑动图片
         slider = "picture/slider.jpg"
         background = "picture/background.jpg"
-        SliderVerificationPage().onload_save_img(slider_url, slider)
-        SliderVerificationPage().onload_save_img(background_url, background)
+        ClientSliderVerificationPage().onload_save_img(slider_url, slider)
+        ClientSliderVerificationPage().onload_save_img(background_url, background)
         # 读取进行色度图片，转换为numpy中的数组类型数据，
         slider_pic = cv2.imread(slider, 0)
         print(slider_pic)
@@ -174,7 +174,7 @@ class SliderVerificationPage():
         @return:
         '''
         # 4.3计算滑动距离
-        sc = SliderVerificationPage()
+        sc = ClientSliderVerificationPage()
         distance = sc.get_element_slide_distance(slideBlock_ele, slideBg_ele)
         # 滑动距离误差校正，滑动距离*图片在网页上显示的缩放比-滑块相对的初始位置
         print("校正前的滑动距离", distance)

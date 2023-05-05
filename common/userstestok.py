@@ -33,7 +33,7 @@ def select_instance(instance, content="*"):
     @param content:
     @return:
     '''
-    sql = "SELECT {} FROM poseidon.bss_instance_no WHERE instanceId = '{}'".format(content, instance)
+    sql = "SELECT {} FROM poseidon.bss_instance_no WHERE instanceId in ('{}')".format(content, instance)
     conn = pymysql.connect(host='bj-cdb-9lx1unfs.sql.tencentcdb.com', port=61861, user='qatmp', password='P&JGRL#VJ6uq',
                            db='poseidon')
     cursor = conn.cursor()
@@ -44,113 +44,70 @@ def select_instance(instance, content="*"):
     return results
 
 
-def check_auth(instance, appKey, appSecret):
+def check_auth(instance, appSecret):
     '''
     sdk差分账号鉴权
     @param serverNumber:
     @return:
     '''
-    selectResults = select_instance(instance, content='appKey,appSecret')
+    selectResults = select_instance(instance, content='appKey')
     print(selectResults)
     url1 = "http://82.157.72.94:8080/api/v3/auth"
     body = {
         "apiType": "1",
         "apiKey": "{}".format(selectResults[0]),
-        "apiSecret": "{}".format(selectResults[1]),
+        "apiSecret": "{}".format(appSecret),
         "deviceId": "{}".format(random.randint(10000, 90000)),
         "deviceType": "{}".format(random.randint(10000, 90000))
     }
     print(body)
     headers = {"Content-Type": "application/json"}
     response = requests.post(url=url1, headers=headers, data=json.dumps(body))
-    print(type(response.text))
-    print(response.text)
+    json_response = json.loads(response.text)
+    if json_response['status'] == 1201:
+        return json_response
+    else:
+        raise Exception('该实例下的差分账号不正常，请重新鉴权')
 
 
-def ntrip_check_server_number(serverNumber):
+def check_server_number(serverNumber, appSecret):
+    '''
+    差分账号登录验证是否可用
+    @param serverNumber:
+    @param appSecret:
+    @return:
+    '''
     server = select_serverNum(serverNumber, content='serverNo,serverPwd,instanceId')
     sleep(2)
-    print(server[2])
-    connectType = select_serverNum(serverNumber, content='connectType')
-    print(connectType)
+    connectType = select_instance(server[2], content='connectType')
     if server:
         if connectType == 3:
-            pass
+            serverNsum = check_auth(server[2], appSecret)['name']
+            serverPswd = check_auth(server[2], appSecret)['pwd']
         else:
-            aes_encrypt = AES_ENCRYPT()
-            d = aes_encrypt.decrypt(server[1].encode("utf-8"))
-            try:
-                sock = socket.socket()
-                sock.connect(("uat1-vrs.sixents.com", 8002))
-                # print(i,d)
-                sock.send(gen_ntriplogin(server[0], d.decode("utf-8"), "RTCM32_GRECJ2"))
-                sss = sock.recv(1024)
-                if b'ICY 200 OK' in sss:
-                    data = '$GPGGA,025006.78,4007.5533880,N,11627.9528726,E,1,00,1.0,109.077,M,-9.077,M,0.0,*54\r\n\r\n'
-                    sock.send(data.encode('utf-8'))
-                else:
-                    return False
+            serverNsum = server[0]
+            serverPswd = server[1]
+        aes_encrypt = AES_ENCRYPT()
+        d = aes_encrypt.decrypt(serverPswd.encode("utf-8"))
+        try:
+            sock = socket.socket()
+            sock.connect(("uat1-vrs.sixents.com", 8002))
+            # print(i,d)
+            sock.send(gen_ntriplogin(serverNsum, d.decode("utf-8"), "RTCM32_GRECJ2"))
+            sss = sock.recv(1024)
+            if b'ICY 200 OK' in sss:
+                data = '$GPGGA,025006.78,4007.5533880,N,11627.9528726,E,1,00,1.0,109.077,M,-9.077,M,0.0,*54\r\n\r\n'
+                sock.send(data.encode('utf-8'))
                 results = sock.recv(4096)
+                sleep(1)
+                sock.close()
                 if results:
                     return True
-                sleep(2)
-                sock.close()
-            except Exception as e:
-                print(e)
+        except Exception as e:
+            print(e)
     else:
         raise Exception('差分账号不存在')
 
 
-# num = 300
-# us = {}
-# # sql1 = """select serverNo,serverPwd from poseidon.bss_server_no bon where serverType=2 and activeRecord=2 and isActive=1 and (expireTime >"2023-10-08 10:07:07.000" or expireTime=null) and serverNo not like "stuser%"  and serverNo not like "hzh%"  order by rand() limit 100"""
-# sql2 = """select serverNo,serverPwd from poseidon.bss_server_no where serverNo in ('xtmwif17055')"""
-# while len(us) < num:
-# cursor.execute(sql2)
-# for i in cursor.fetchall():
-#     print(i)
-#         # print(i)
-#         aes_encrypt = AES_ENCRYPT()
-#         d = aes_encrypt.decrypt(i[1].encode("utf-8"))
-#         try:
-#             sock = socket.socket()
-#             sock.connect(("uat1-vrs.sixents.com", 8002))
-#             # print(i,d)
-#             sock.send(gen_ntriplogin(i[0], d.decode("utf-8"), "RTCM32_GRECJ2"))
-#             sss = sock.recv(1024)
-#             # print(sss)
-#             if b'ICY 200 OK' in sss:
-#                 us[i[0]] = [i[0], d.decode("utf-8"), "uat1-vrs.sixents.com", 8002, "RTCM32_GRECJ2"]
-#                 print(us[i[0]])
-#             sock.close()
-#         except Exception as e:
-#             print(e)
-# with open('test1us1.json', 'w', encoding='utf-8') as f:
-#     us = json.dump({"users": list(us.values())}, f)
-#
-#     # num = 300
-# cursor.close()
-# conn.close()
-# exit(0)
-# with open('test1us.json', 'r', encoding='utf-8') as f:
-#     us = json.load(f)
-# for u in us['users']:
-#     for i in ["82.157.72.94", ]:
-#         u[2] = i
-#         try:
-#             sock = socket.socket()
-#             sock.connect(tuple(u[2:4]))
-#             print(gen_ntriplogin(*u[:2], u[-1]))
-#             # print(u)
-#             sock.send(gen_ntriplogin(*u[:2], u[-1]))
-#             sss = sock.recv(1024)
-#             print(sss)
-#             if b'200 OK' in sss:
-#                 print(u, sss)
-#             sock.close()
-#         except Exception as e:
-#             print(e)
-#             raise
-
 if __name__ == '__main__':
-    print(check_auth('68356'))
+    print(check_server_number('xtmwif17052','vw0x0jhez1j8yzedf1qbu65yqgbew631y18dsaxjc5n91dg9qxq3gnv4cisybdur'))
