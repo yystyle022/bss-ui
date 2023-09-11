@@ -18,3 +18,17 @@ class HomeBase:
         @return:
         '''
         return "//a[contains(text(),'注册')]"
+
+    def liqingHomePageTitleXpath(self):
+        '''
+        首页厘清购买按钮xpath
+        @return:
+        '''
+        return "//h5[text()='厘清/Locate-CM']"
+
+    def liqingHomePagePurchaseButtonXpath(self):
+        '''
+        首页厘清购买按钮xpath
+        @return:
+        '''
+        return "//h5[text()='厘清/Locate-CM']/..//span[text()='立即购买']"

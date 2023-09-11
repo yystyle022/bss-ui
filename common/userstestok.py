@@ -33,7 +33,7 @@ def select_instance(instance, content="*"):
     @param content:
     @return:
     '''
-    sql = "SELECT {} FROM poseidon.bss_instance_no WHERE instanceId in ('{}')".format(content, instance)
+    sql = "SELECT {} FROM poseidon.bss_instance_no WHERE instanceId in ('{}') AND isbind = 0".format(content, instance)
     conn = pymysql.connect(host='bj-cdb-9lx1unfs.sql.tencentcdb.com', port=61861, user='qatmp', password='P&JGRL#VJ6uq',
                            db='poseidon')
     cursor = conn.cursor()
@@ -44,30 +44,32 @@ def select_instance(instance, content="*"):
     return results
 
 
-def check_auth(instance, appSecret):
+def check_auth(instance, appSecret,number:int):
     '''
     sdk差分账号鉴权
     @param serverNumber:
     @return:
     '''
-    selectResults = select_instance(instance, content='appKey')
-    print(selectResults)
-    url1 = "http://82.157.72.94:8080/api/v3/auth"
-    body = {
-        "apiType": "1",
-        "apiKey": "{}".format(selectResults[0]),
-        "apiSecret": "{}".format(appSecret),
-        "deviceId": "{}".format(random.randint(10000, 90000)),
-        "deviceType": "{}".format(random.randint(10000, 90000))
-    }
-    print(body)
-    headers = {"Content-Type": "application/json"}
-    response = requests.post(url=url1, headers=headers, data=json.dumps(body))
-    json_response = json.loads(response.text)
-    if json_response['status'] == 1201:
-        return json_response
-    else:
-        raise Exception('该实例下的差分账号不正常，请重新鉴权')
+    id = random.sample(range(100,1000000),number)
+    for i in id:
+        selectResults = select_instance(instance, content='appKey')
+        print(selectResults)
+        url1 = "http://pre-openapi.sixents.com/sdkauth/v1/auth"
+        body = {
+            "apiType": "1",
+            "apiKey": "{}".format(selectResults[0]),
+            "apiSecret": "{}".format(appSecret),
+            "deviceId": "{}".format(i),
+            "deviceType": "{}".format(i)
+        }
+        print(body)
+        headers = {"Content-Type": "application/json"}
+        response = requests.post(url=url1, headers=headers, data=json.dumps(body))
+        json_response = json.loads(response.text)
+        if json_response['status'] == 1201:
+            return json_response
+        else:
+            raise Exception('该实例下的差分账号不正常，请重新鉴权')
 
 
 def check_server_number(serverNumber, appSecret):
@@ -81,6 +83,7 @@ def check_server_number(serverNumber, appSecret):
     sleep(2)
     connectType = select_instance(server[2], content='connectType')
     if server:
+        #sdk连接方式
         if connectType == 3:
             serverNsum = check_auth(server[2], appSecret)['name']
             serverPswd = check_auth(server[2], appSecret)['pwd']

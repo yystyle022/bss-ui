@@ -15,10 +15,8 @@ def gen_ntriplogin(username: str, password: str, monutpoint: str):
     '''
     strUser = '%s:%s' % (username, password)
     bytesUser = base64.b64encode(strUser.encode('utf-8'))
-
     strLogin = 'GET /%s HTTP/1.0\r\nUser-Agent: NTRIP RTKLIB/2.4.3\r\nAccept: */*\r\nAuthorization: Basic %s\r\nConnection: close\r\n\r\n' % (
         monutpoint, bytesUser.decode())
-
     return strLogin.encode('utf-8')
 
 if __name__ == '__main__':

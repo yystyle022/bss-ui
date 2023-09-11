@@ -10,7 +10,7 @@ from page.HomePage import HomePage
 from page.ObjectMap import ObjectMap
 from base.ClientLoginBase import LoginBase
 from logs.log_config import log
-from page.ClientSliderVerificationPage import SliderVerificationPage
+from page.ClientSliderVerificationPage import ClientSliderVerificationPage
 from common.report_add_img import add_img_to_report
 
 
@@ -89,8 +89,8 @@ class LoginPage():
             add_img_to_report(driver, '点击登录按钮')
             sleep(3)
         with allure.step('滑动滑块验证'):
-            elements_3 = SliderVerificationPage().get_3_ele(driver)
-            SliderVerificationPage().move_slider(driver, *elements_3)
+            elements_3 = ClientSliderVerificationPage().get_3_ele(driver)
+            ClientSliderVerificationPage().move_slider(driver, *elements_3)
             log.info('滑动滑块验证')
             add_img_to_report(driver, '滑动滑块进行验证')
             self.assert_login_success(driver)

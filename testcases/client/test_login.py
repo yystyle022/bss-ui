@@ -24,6 +24,5 @@ class TestLogin():
         '''
         with allure.step('登录'):
             LoginPage().login(driver, url, username, password)
-            # driver.quit()
 
 

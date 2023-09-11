@@ -125,7 +125,7 @@ class ClientSliderVerificationPage():
         :type: int
         :return:
         """
-        # 获取滑动前页面的url地址
+        # # 获取滑动前页面的url地址
         # start_url = driver.current_url
         print("需要滑动的距离为：", distance)
         # 根据滑动距离生成滑动轨迹
