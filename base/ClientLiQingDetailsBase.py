@@ -90,3 +90,10 @@ class ClientLiQingDetailsBase:
         @return:
         '''
         return "//span[text()='确认支付']"
+
+    def paySuccessIdentificationXpath(self):
+        '''
+        支付成功标识Xpath
+        @return:
+        '''
+        return "//div[text()='订单支付成功']"
