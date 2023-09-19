@@ -82,14 +82,14 @@ class ClientLiQingDetailsBase:
         提交订单按钮Xpath
         @return:
         '''
-        return "//span[text()='提交订单']"
+        return "//button"
 
     def confirmPaymentButtonXpath(self):
         '''
         确认支付按钮
         @return:
         '''
-        return "//span[text()='确认支付']"
+        return "//button"
 
     def paySuccessIdentificationXpath(self):
         '''

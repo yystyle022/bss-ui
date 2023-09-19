@@ -14,6 +14,7 @@ import numpy as np
 from time import sleep
 from datetime import datetime
 from playwright.sync_api import sync_playwright
+from base.ClientLiQingDetailsBase import ClientLiQingDetailsBase
 
 clientURL = "https://bss-front-uat.sixents.com"
 clientUsername = "18322369885"
@@ -142,7 +143,7 @@ def write_log_to_allure(text):
     @param text:
     @return:
     '''
-    allure.attach(f'{currentTime}---{text}', name='runlog', attachment_type=allure.attachment_type.TEXT)
+    allure.attach(f'{currentTime}  {text}', name='runlog', attachment_type=allure.attachment_type.TEXT)
 
 
 def assert_element_exist(page, element):
@@ -152,105 +153,159 @@ def assert_element_exist(page, element):
     @param element:
     @return:
     '''
-    assert page.locator(element).count() == 1, '登录失败'
+    assert page.locator(element).count() > 0, '页面进入失败'
 
 
-def get_page():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True, args=["--start-maximized"])
-        context = browser.new_context(no_viewport=True)
-        page = context.new_page()
-        return page
+def client_login(page):
+    '''
+    登录官网
+    @param page:
+    @return:
+    '''
+    with allure.step('打开官网进入首页'):
+        page.goto(clientURL)
+        write_log_to_allure(f'打开官网{clientURL},进入首页成功')
+        screenshot_to_allure(page, '打开官网进入首页')
 
+    with allure.step('点击登录按钮'):
+        page.click('//a[contains(text(),"登录")]')
+        write_log_to_allure('点击页面左上角登录按钮，进入登录页面成功')
+        screenshot_to_allure(page, '点击登录按钮进入登录页面')
 
-def client_login():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False, args=["--start-maximized"])
-        context = browser.new_context(no_viewport=True)
-        page = context.new_page()
+    with allure.step('输入用户名'):
+        page.fill('//input[@placeholder="请输入账号或手机号码"]', clientUsername)
+        write_log_to_allure(f'输入用户名:{clientUsername}')
+        screenshot_to_allure(page, '输入用户名')
 
-        with allure.step('打开官网进入首页'):
-            page.goto(clientURL)
-            write_log_to_allure(f'打开官网{clientURL},进入首页成功')
-            screenshot_to_allure(page, '打开官网进入首页')
+    with allure.step('输入密码'):
+        page.fill('//input[@placeholder="请输入密码"]', clientPassword)
+        write_log_to_allure(f'输入密码:{clientPassword}')
+        screenshot_to_allure(page, '输入密码')
 
-        with allure.step('点击登录按钮'):
-            page.click('//a[contains(text(),"登录")]')
-            write_log_to_allure('点击页面左上角登录按钮，进入登录页面成功')
-            screenshot_to_allure(page, '点击登录按钮进入登录页面')
+    with allure.step('点击登录按钮'):
+        page.click('//button[@type="submit"]')
+        write_log_to_allure(f'点击页面登录按钮，进行登录')
+        screenshot_to_allure(page, '点击登录按钮')
+        sleep(2)
 
-        with allure.step('输入用户名'):
-            page.fill('//input[@placeholder="请输入账号或手机号码"]', clientUsername)
-            write_log_to_allure(f'输入用户名:{clientUsername}')
-            screenshot_to_allure(page, '输入用户名')
+    with allure.step('获取登录页面滑块验证信息'):
+        download_images(page, image_name="slider", frame_xpath="//iframe[@id='tcaptcha_iframe']", image_xpath="//img[@id='slideBlock']", save_directory='picture')
+        download_images(page, image_name="background", frame_xpath="//iframe[@id='tcaptcha_iframe']", image_xpath="//img[@id='slideBg']", save_directory='picture')
+        write_log_to_allure('下载滑块图片成功')
+        position = dragbox_location(page)
+        x = position['x'] + position['width'] / 2
+        y = position['y'] + position['height'] / 2
+        write_log_to_allure(f'开始计算滑块的中心点位置坐标，X坐标为：{x},Y坐标为：{y}')
+        distance = get_slide_locus(get_slide_distance() * (280 / 680) + 6)
+        write_log_to_allure(f'开始计算滑块滑动数据，滑动的距离列表为{distance}')
 
-        with allure.step('输入密码'):
-            page.fill('//input[@placeholder="请输入密码"]', clientPassword)
-            write_log_to_allure(f'输入密码:{clientPassword}')
-            screenshot_to_allure(page, '输入密码')
-
-        with allure.step('点击登录按钮'):
-            page.click('//button[@type="submit"]')
-            write_log_to_allure(f'点击页面登录按钮，进行登录')
-            screenshot_to_allure(page, '点击登录按钮')
-            sleep(2)
-
-        with allure.step('获取登录页面滑块验证信息'):
-            download_images(page, image_name="slider", frame_xpath="//iframe[@id='tcaptcha_iframe']", image_xpath="//img[@id='slideBlock']", save_directory='picture')
-            download_images(page, image_name="background", frame_xpath="//iframe[@id='tcaptcha_iframe']", image_xpath="//img[@id='slideBg']", save_directory='picture')
-            write_log_to_allure('下载滑块图片成功')
-            position = dragbox_location(page)
-            x = position['x'] + position['width'] / 2
-            y = position['y'] + position['height'] / 2
-            write_log_to_allure(f'开始计算滑块的中心点位置坐标，X坐标为：{x},Y坐标为：{y}')
-            distance = get_slide_locus(get_slide_distance() * (280 / 680) + 6)
-            write_log_to_allure(f'开始计算滑块滑动数据，滑动的距离列表为{distance}')
-
-        with allure.step('滑动滑块验证'):
+    with allure.step('滑动滑块验证'):
+        page.mouse.move(x, y)
+        page.mouse.down()
+        sleep(0.1)
+        for i in distance:
+            x = x + i
             page.mouse.move(x, y)
-            page.mouse.down()
-            sleep(0.1)
-            for i in distance:
-                x = x + i
-                page.mouse.move(x, y)
-            page.mouse.up()
-            write_log_to_allure('开始移动滑块进行验证')
-            screenshot_to_allure(page, '滑动滑块验证')
-            sleep(2)
+        page.mouse.up()
+        write_log_to_allure('开始移动滑块进行验证')
+        screenshot_to_allure(page, '滑动滑块验证')
+        sleep(2)
 
-        with allure.step('验证是否登录成功'):
-            assert_element_exist(page, "//a[contains(text(),'控制台')]")
-            write_log_to_allure('控制台元素存在，登录成功，进入首页')
-            screenshot_to_allure(page, '验证是否登录成功')
+    with allure.step('验证是否登录成功'):
+        assert_element_exist(page, "//a[contains(text(),'控制台')]")
+        write_log_to_allure('控制台元素存在，登录成功，进入首页')
+        screenshot_to_allure(page, '验证是否登录成功')
 
 
-def management_login():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False, args=["--start-maximized"])
-        context = browser.new_context(no_viewport=True)
-        page = context.new_page()
-        with allure.step('打开管理端官网进入登录页'):
-            page.goto(managementURL)
-            write_log_to_allure(f'打开管理端官网:{managementURL},进入登录页面')
-            screenshot_to_allure(page, '打开官网进入首页')
+def management_login(page):
+    '''
+    登录管理端
+    @param page:
+    @return:
+    '''
+    with allure.step('打开管理端官网进入登录页'):
+        page.goto(managementURL)
+        write_log_to_allure(f'打开管理端官网:{managementURL},进入登录页面')
+        screenshot_to_allure(page, '打开官网进入首页')
 
-        with allure.step('输入用户名'):
-            page.fill("//input[@placeholder='账号或手机号']", managementUsername)
-            write_log_to_allure(f'输入用户名：{managementUsername}')
-            screenshot_to_allure(page, '输入用户名')
+    with allure.step('输入用户名'):
+        page.fill("//input[@placeholder='账号或手机号']", managementUsername)
+        write_log_to_allure(f'输入用户名：{managementUsername}')
+        screenshot_to_allure(page, '输入用户名')
 
-        with allure.step('输入密码'):
-            page.fill("//input[@placeholder='密码']", managementPassword)
-            write_log_to_allure(f'输入用密码：{managementPassword}')
-            screenshot_to_allure(page, '输入密码')
+    with allure.step('输入密码'):
+        page.fill("//input[@placeholder='密码']", managementPassword)
+        write_log_to_allure(f'输入用密码：{managementPassword}')
+        screenshot_to_allure(page, '输入密码')
 
-        with allure.step('点击登录按钮'):
-            page.click('//button[@type="submit"]')
-            write_log_to_allure('点击登录按钮,进行登录')
-            screenshot_to_allure(page, '点击登录按钮')
-            sleep(2)
+    with allure.step('点击登录按钮'):
+        page.click('//button[@type="submit"]')
+        write_log_to_allure('点击登录按钮,进行登录')
+        screenshot_to_allure(page, '点击登录按钮')
+        sleep(2)
 
-        with allure.step('验证是否登录成功'):
-            assert_element_exist(page, "//span[text()='首页']")
-            write_log_to_allure('验证页面是否包含首页元素，首页元素存在，登录成功')
-            screenshot_to_allure(page, '验证是否登录成功')
+    with allure.step('验证是否登录成功'):
+        assert_element_exist(page, "//span[text()='首页']")
+        write_log_to_allure('验证页面是否包含首页元素，首页元素存在，登录成功')
+        screenshot_to_allure(page, '验证是否登录成功')
+
+
+def purchase_server_number(page, active: int = 1, bind: int = 1, duration: int = 1, sums: str = "1"):
+    with allure.step('选择页面购买时长'):
+        if duration == 1:
+            page.click(ClientLiQingDetailsBase().purchaseDurationOneDayXpath())
+            write_log_to_allure('选择购买时长为1天，选择成功')
+        elif duration == 2:
+            page.click(ClientLiQingDetailsBase().purchaseDurationOneMonthXpath())
+            write_log_to_allure('选择购买时长为1个月，选择成功')
+        elif duration == 3:
+            page.click(ClientLiQingDetailsBase().purchaseDurationOneYearXpath())
+            write_log_to_allure('选择购买时长为1年，选择成功')
+        screenshot_to_allure(page, '购买时长选择成功')
+
+    with allure.step('选择差分账号激活方式'):
+        if active == 1:
+            page.click(ClientLiQingDetailsBase().autoActiveMethodXpath())
+            write_log_to_allure('选择自动激活方式成功')
+        elif active == 2:
+            page.click(ClientLiQingDetailsBase().manualActiveMethodXpath())
+            write_log_to_allure('选择手动激活方式成功')
+        screenshot_to_allure(page, '选择差分账号激活方式成功')
+
+    with allure.step('选择差分账号绑定方式'):
+        if bind == 1:
+            page.click(ClientLiQingDetailsBase().autoBindMethodXpath())
+            write_log_to_allure('选择自动激活方式成功')
+        elif bind == 2:
+            page.click(ClientLiQingDetailsBase().manualBindMethodXpath())
+            write_log_to_allure('选择手动激活方式成功')
+        screenshot_to_allure(page, '选择差分账号绑定方式成功')
+
+    with allure.step('填写差分账号购买数量'):
+        page.click(ClientLiQingDetailsBase().purchaseSumXpath())
+        page.fill(ClientLiQingDetailsBase().purchaseSumXpath(), sums)
+        write_log_to_allure(f'填写购买的差分账号数量，购买数量为{sums}，数量填写成功')
+        screenshot_to_allure(page, '填写差分账号购买数量')
+
+    with allure.step('点击立即购买'):
+        page.click(ClientLiQingDetailsBase().purchaseButtonXpath())
+        write_log_to_allure('点击立即购买按钮')
+        screenshot_to_allure(page, '点击立即购买按钮')
+        sleep(2)
+
+    with allure.step('点击提交订单按钮，进入确认支付页面'):
+        page.click(ClientLiQingDetailsBase().submitOrderButtonXpath())
+        write_log_to_allure('点击提交订单按钮，进入确认支付页面')
+        screenshot_to_allure(page, '点击提交订单按钮，进入确认支付页面')
+        sleep(2)
+
+    with allure.step('点击确认支付按钮，支付订单成功'):
+        page.click('text=确认支付')
+        write_log_to_allure('点击确认支付按钮，支付订单成功')
+        screenshot_to_allure(page, '点击确认支付按钮，支付订单成功')
+        sleep(2)
+
+    with allure.step('判断是否支付成功'):
+        assert_element_exist(page, ClientLiQingDetailsBase().paySuccessIdentificationXpath())
+        write_log_to_allure('支付成功')
+        screenshot_to_allure(page, '判断是否支付成功')

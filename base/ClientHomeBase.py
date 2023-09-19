@@ -21,7 +21,7 @@ class HomeBase:
 
     def liqingHomePageTitleXpath(self):
         '''
-        首页厘清购买按钮xpath
+        首页厘清icon的xpath
         @return:
         '''
         return "//h5[text()='厘清/Locate-CM']"
