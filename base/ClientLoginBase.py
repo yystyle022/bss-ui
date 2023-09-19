@@ -6,7 +6,7 @@ class LoginBase:
 
     def loginInputXpath(self, input_placeholder):
         '''
-        返回登录页面的用户名，密码输入框的Xpath
+        登录页面的用户名，密码输入框的Xpath
         @param input_placeholder: 输入框名称
                账号输入框：请输入账号或手机号码
                密码输入框：请输入密码
@@ -16,7 +16,7 @@ class LoginBase:
 
     def submitButtonXpath(self):
         '''
-        返回登录按钮xpath
+        登录按钮xpath
         @return:
         '''
         return "//button[@type='submit']"
