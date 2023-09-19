@@ -32,3 +32,10 @@ class HomeBase:
         @return:
         '''
         return "//h5[text()='厘清/Locate-CM']/..//span[text()='立即购买']"
+
+    def consoleXpath(self):
+        '''
+        首页控制台xpath
+        @return:
+        '''
+        return "//a[contains(text(),'控制台')]"

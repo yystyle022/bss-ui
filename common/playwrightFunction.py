@@ -131,8 +131,9 @@ def screenshot_to_allure(page, name):
     @param name:
     @return:
     '''
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    path = f'../result/{name}.png'
     sleep(1)
-    path = '/bss-ui/picture'
     page.screenshot(timeout=5000, path=path)
     allure.attach.file(path, name=name, attachment_type=allure.attachment_type.PNG)
 
@@ -186,7 +187,7 @@ def client_login(page):
         page.click('//button[@type="submit"]')
         write_log_to_allure(f'点击页面登录按钮，进行登录')
         screenshot_to_allure(page, '点击登录按钮')
-        sleep(2)
+        sleep(1)
 
     with allure.step('获取登录页面滑块验证信息'):
         download_images(page, image_name="slider", frame_xpath="//iframe[@id='tcaptcha_iframe']", image_xpath="//img[@id='slideBlock']", save_directory='picture')
@@ -202,7 +203,7 @@ def client_login(page):
     with allure.step('滑动滑块验证'):
         page.mouse.move(x, y)
         page.mouse.down()
-        sleep(0.1)
+        sleep(0.2)
         for i in distance:
             x = x + i
             page.mouse.move(x, y)
@@ -251,6 +252,15 @@ def management_login(page):
 
 
 def purchase_server_number(page, active: int = 1, bind: int = 1, duration: int = 1, sums: str = "1"):
+    '''
+    购买差分账号
+    @param page:page驱动
+    @param active:激活方式
+    @param bind:绑定方式
+    @param duration:购买时长
+    @param sums:购买数量
+    @return:
+    '''
     with allure.step('选择页面购买时长'):
         if duration == 1:
             page.click(ClientLiQingDetailsBase().purchaseDurationOneDayXpath())
@@ -291,21 +301,65 @@ def purchase_server_number(page, active: int = 1, bind: int = 1, duration: int =
         page.click(ClientLiQingDetailsBase().purchaseButtonXpath())
         write_log_to_allure('点击立即购买按钮')
         screenshot_to_allure(page, '点击立即购买按钮')
-        sleep(2)
+        sleep(1)
 
     with allure.step('点击提交订单按钮，进入确认支付页面'):
         page.click(ClientLiQingDetailsBase().submitOrderButtonXpath())
         write_log_to_allure('点击提交订单按钮，进入确认支付页面')
         screenshot_to_allure(page, '点击提交订单按钮，进入确认支付页面')
-        sleep(2)
+        sleep(1)
 
     with allure.step('点击确认支付按钮，支付订单成功'):
         page.click('text=确认支付')
         write_log_to_allure('点击确认支付按钮，支付订单成功')
         screenshot_to_allure(page, '点击确认支付按钮，支付订单成功')
-        sleep(2)
+        sleep(1)
 
     with allure.step('判断是否支付成功'):
         assert_element_exist(page, ClientLiQingDetailsBase().paySuccessIdentificationXpath())
         write_log_to_allure('支付成功')
         screenshot_to_allure(page, '判断是否支付成功')
+
+
+def expand_server_number(page, instanceId='9871524', duration=1, sums='5'):
+    '''
+    扩容差分账号
+    @param page:
+    @param instanceId: 实例Id
+    @param duration: 扩容时长
+    @param sums: 扩容数量
+    @return:
+    '''
+    with allure.step('实例id输入框输入需要扩容的实例Id'):
+        page.fill("//input[@placeholder='请输入']", instanceId)
+        write_log_to_allure(f'输入实例Id:{instanceId}')
+        screenshot_to_allure(page, f'输入实例Id:{instanceId}')
+
+    with allure.step('点击查询按钮进行实例查询'):
+        page.click("//button[1]")
+        write_log_to_allure('点击查询按钮进行查询')
+        screenshot_to_allure(page, '点击查询按钮进行查询')
+        sleep(2)
+
+    with allure.step('获取扩容前实例下差分账号个数'):
+        number = page.query_selector("//td[text()='9871524']/following-sibling::td[7]").text_content()
+        write_log_to_allure(f'实例下的差分账号数量为：{number}')
+
+    with allure.step('点击实例的扩容按钮，进入扩容详情页面'):
+        page.click("//a[text()='扩容']")
+        write_log_to_allure('点击实例的扩容按钮，进入扩容详情页面')
+        screenshot_to_allure(page, '点击实例的扩容按钮，进入扩容详情页面')
+        sleep(2)
+
+
+    with allure.step('扩容页面选择购买时长'):
+        if duration == 1:
+            page.click(ClientLiQingDetailsBase().purchaseDurationOneDayXpath())
+            write_log_to_allure('选择购买时长为1天，选择成功')
+        elif duration == 2:
+            page.click(ClientLiQingDetailsBase().purchaseDurationOneMonthXpath())
+            write_log_to_allure('选择购买时长为1个月，选择成功')
+        elif duration == 3:
+            page.click(ClientLiQingDetailsBase().purchaseDurationOneYearXpath())
+            write_log_to_allure('选择购买时长为1年，选择成功')
+        screenshot_to_allure(page, '购买时长选择成功')
