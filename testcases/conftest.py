@@ -7,6 +7,7 @@ import yaml
 import pytest
 from config.driver_config import DriverConfig
 from common.report_add_img import add_img_to_report
+from playwright.sync_api import sync_playwright
 
 current_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
@@ -20,6 +21,54 @@ def driver():
     driver = DriverConfig().chrome_driver_config()
     yield driver
     driver.quit()
+
+
+@pytest.fixture()
+def chromium_browser():
+    playwright = sync_playwright().start()
+    browser = playwright.chromium.launch(headless=False, args=["--start-maximized"])
+    context = browser.new_context(no_viewport=True)
+    page = context.new_page()
+    yield page
+    context.close()
+    browser.close()
+    playwright.stop()
+
+
+@pytest.fixture()
+def chrome_browser():
+    playwright = sync_playwright().start()
+    browser = playwright.chromium.launch(channel="chrome", headless=False, args=["--start-maximized"])
+    context = browser.new_context(no_viewport=True)
+    page = context.new_page()
+    yield page
+    context.close()
+    browser.close()
+    playwright.stop()
+
+
+@pytest.fixture()
+def edge_browser():
+    playwright = sync_playwright().start()
+    browser = playwright.chromium.launch(channel="msedge", headless=False, args=["--start-maximized"])
+    context = browser.new_context(no_viewport=True)
+    page = context.new_page()
+    yield page
+    context.close()
+    browser.close()
+    playwright.stop()
+
+
+@pytest.fixture()
+def firefox_browser():
+    playwright = sync_playwright().start()
+    browser = playwright.firefox.launch(headless=False)
+    context = browser.new_context(viewport={'width': 1920, 'height': 1080}, )
+    page = context.new_page()
+    yield page
+    context.close()
+    browser.close()
+    playwright.stop()
 
 
 @pytest.fixture()
