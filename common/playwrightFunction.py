@@ -13,7 +13,6 @@ import requests
 import numpy as np
 from time import sleep
 from datetime import datetime
-from playwright.sync_api import sync_playwright
 from base.ClientLiQingDetailsBase import ClientLiQingDetailsBase
 
 clientUsername = "18322369885"
@@ -26,7 +25,10 @@ managementUsername = "test"
 managementPassword = "liufenceshi123"
 managementUsername1 = "testss"
 managementPassword1 = "$Nbiud8po23%yf*FK"
+AuthURL = "https://test1-auth.sixents.com/sdkauth/v1/auth"
+# AuthURL = "https://openapi.sixents.com/sdkauth/v1/auth"
 expandInstanceId = "9871572"
+reviewServerNumber = ""
 
 
 def dragbox_location(page):
@@ -137,7 +139,7 @@ def screenshot_to_allure(page, name):
     '''
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
     path = f'../result/{name}.png'
-    sleep(1)
+    sleep(0.5)
     page.screenshot(timeout=5000, path=path)
     allure.attach.file(path, name=name, attachment_type=allure.attachment_type.PNG)
 
@@ -662,7 +664,18 @@ def assert_step(page, describe, element):
         screenshot_to_allure(page, describe)
 
 
-def go_to_online_order_application_page(page, model: str = '1', where: str = '2'):
+def write_and_screenshot(page, describe):
+    '''
+    记录日志和截图步骤
+    @param page: 驱动
+    @param describe: 描述
+    @return:
+    '''
+    write_log_to_allure(describe)
+    screenshot_to_allure(page, describe)
+
+
+def go_to_online_order_application_page(page, model: str = '1', where: str = '1'):
     '''
     线下订单申请进入不同类型的订单页面
     @param page:
@@ -820,7 +833,7 @@ def online_order_application_new_purchase_common_model(page,
     @param BindMethod:绑定方法  1：自动绑定  2：手动绑定
     @param ActiveTime:激活时点  1：非实时激活  2：实时激活  3：在截止日期前激活
     @param PurchaseSums:购买数量
-    @param PurchaseDurationUnit:购买时长单位  1：天  2：月  3：年
+    @param PurchaseDurationType:购买时长单位  1：天  2：月  3：年
     @param PurchaseDuration:购买时长
     @param PurchasePrice:购买价格
     @return:No return
@@ -934,3 +947,51 @@ def review_online_order_application(page, OrderNumber):
     fill_step(page=page, describe='输入审核备注信息：UI测试订单', position="//textarea", number='UI测试订单')
     click_step(page=page, describe=f'点击提交按钮', position="//span[text()='提 交']")
     assert_step(page=page, describe='查看【操作成功】toast提示是否存在', element="//span[text()='操作成功']")
+
+
+def get_server_number(page, ReviewOrderNumber: str, OrderType: str = '1'):
+    '''
+    管理端获取线下订单申请生成的差分账号
+    @param page:
+    @param OrderType:
+    @param ReviewOrderNumber:
+    @return:
+    '''
+    list = []
+    click_step(page=page, describe='点击首页左侧导航栏【服务产品管理】，弹出子菜单', position="//span[text()='服务产品管理']")
+    click_step(page=page, describe='点击首页左侧导航栏【服务订单】，进入服务订单列表页面', position="//span[text()='服务订单']")
+    if OrderType == '3':
+        click_step(page=page, describe='点击顶部续费订单，进入续费订单列表页面', position="//div[text()='续费订单']")
+        click_step(page=page, describe='点击续费申请单详情，进入到申请单详情页面', position="//tr[3]//a")
+        sleep(2)
+        with allure.step('统计实例下差分账号的个数'):
+            sum = page.locator("//th[@key='serverNo']/../../following-sibling::tbody/tr").count()
+            write_log_to_allure(f'差分账号个数为：{sum}')
+            screenshot_to_allure(page, name=f'差分账号个数截图')
+            print(f"实例下的差分账号个数为：{sum}")
+        with allure.step('返回差分账号列表'):
+            for i in range(1, sum + 1):
+                ServerNumber = page.query_selector(f"//th[@key='serverNo']/../../following-sibling::tbody/tr[{i}]/td[1]").text_content()
+                list.append(ServerNumber)
+            write_log_to_allure(f'差分账号列表为：{list}')
+            return list
+    else:
+        if OrderType == '1':
+            click_step(page=page, describe='点击顶部普通订单，进入普通订单列表页面', position="//div[text()='普通订单']")
+        elif OrderType == '2':
+            click_step(page=page, describe='点击顶部扩容订单，进入扩容订单列表页面', position="//div[text()='扩容订单']")
+        elif OrderType == '4':
+            click_step(page=page, describe='点击顶部试用转正式订单，进入试用转正式订单列表页面', position="//div[text()='试用转正式订单']")
+        click_step(page=page, describe='点击申请单详情，进入到申请单详情页面', position=f"//span[contains(text(),'{ReviewOrderNumber}')]/../../../following-sibling::tr[1]//a")
+        sleep(2)
+        with allure.step('统计实例下差分账号的个数'):
+            sum = page.locator("//th[@key='serverNo']/../../following-sibling::tbody/tr").count()
+            write_log_to_allure(f'差分账号个数为：{sum}')
+            screenshot_to_allure(page, name=f'差分账号个数截图')
+            print(f"实例下的差分账号个数为：{sum}")
+        with allure.step('返回差分账号列表'):
+            for i in range(1, sum + 1):
+                ServerNumber = page.query_selector(f"//th[@key='serverNo']/../../following-sibling::tbody/tr[{i}]/td[1]").text_content()
+                list.append(ServerNumber)
+            write_log_to_allure(f'差分账号列表为：{list}')
+            return list

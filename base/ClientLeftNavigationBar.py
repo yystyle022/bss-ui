@@ -15,13 +15,35 @@ class ClientLeftNavigationBar():
 
     def accountCmXpath(self):
         '''
-        厘米级服务
+        厘米级服务Xpath
         @return:
         '''
         return "//span[text()='厘米级服务']"
 
     def accountCmOverviewXpath(self):
         '''
-        厘米级服务概览
+        厘米级服务概览Xpath
         @return:
         '''
+        return "//span[text()='概览']"
+
+    def accountCmInstanceXpath(self):
+        '''
+        厘米级服务实例Xpath
+        @return:
+        '''
+        return "//span[text()='厘米级服务']/../../following-sibling::ul//span[text()='实例']"
+
+    def accountCmFormalNumberXpath(self):
+        '''
+        厘米级服务正式账号Xpath
+        @return:
+        '''
+        return "//span[text()='厘米级服务']/../../following-sibling::ul//span[text()='正式账号']"
+
+    def accountCmTryNumberXpath(self):
+        '''
+        试用账号Xpath
+        @return:
+        '''
+        return "//span[text()='厘米级服务']/../../following-sibling::ul//span[text()='试用账号']"
