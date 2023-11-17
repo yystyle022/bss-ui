@@ -46,10 +46,9 @@ class DriverConfig():
         options.add_experimental_option("excludeSwitches", ['enable-automation', 'enable-logging'])
         # 实例化浏览器驱动
         # driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-        driver = webdriver.Chrome(
-            service=Service(ChromeDriverManager(url=r'https://registry.npmmirror.com/-/binary/chromedriver',
-                                                latest_release_url=r'https://registry.npmmirror.com/-/binary/chromedriver/LATEST_RELEASE',
-                                                cache_valid_range=30).install()), options=options)
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager(url=r'https://registry.npmmirror.com/-/binary/chromedriver',
+                                                                      latest_release_url=r'https://registry.npmmirror.com/-/binary/chromedriver/LATEST_RELEASE',
+                                                                      cache_valid_range=30).install()), options=options)
         # driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=options)
         # 隐性等待时间
         driver.implicitly_wait(4)

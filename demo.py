@@ -2,72 +2,46 @@
 # @Time : 2023/4/26 11:01
 # @Author : yangyang
 # @File : bss-ui/demo.py
-from page.LoginPage import LoginPage
-from page.ClientLiQingDetailPage import ClientLiQingDetailPage
-from config.driver_config import DriverConfig
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.edge.service import Service as EdgeService
-from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
-def chrome_driver_config():
-    '''
-    谷歌浏览器驱动
-    @return:返回谷歌浏览器驱动
-    '''
-    # global driver
-    options = webdriver.ChromeOptions()
-    options.add_argument('disable-infobars')
-    # 无头模式
-    # options.add_argument('--headless')
-    # 设置窗口大小
-    # options.add_argument("window-size=1920,1080")
-    # 设置最大化窗口
-    options.add_argument("--start-maximized")
-    # 解决卡顿
-    options.add_argument('--disable-gpu')
-    options.add_argument('--ignore-certificate-errors')
-    options.add_argument('--no-sanbox')
-    options.add_argument('--disable-dev-shm-usage')
-    # 增加浏览器型号
-    # options.add_argument('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36')
-    # 解决selenium无法访问https的问题
-    options.add_argument('--allow-insecure-localhost')
-    # 处理SSL证书错误问题
-    options.add_argument('--ignore-ssl-errors')
-    # 无痕模式
-    options.add_argument('--incognito')
-    # 去除chrome正受到自动测试软件的控制
-    options.add_experimental_option('excludeSwitches', ['enable-automation'])
-    options.add_experimental_option("detach", True)
-    # 忽略无用的日志
-    options.add_experimental_option("excludeSwitches", ['enable-automation', 'enable-logging'])
-    # 实例化浏览器驱动
-    # driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-    driver = webdriver.Chrome(
-        service=Service(ChromeDriverManager(url=r'https://registry.npmmirror.com/-/binary/chromedriver',
-                                            latest_release_url=r'https://registry.npmmirror.com/-/binary/chromedriver/LATEST_RELEASE',
-                                            cache_valid_range=30).install()), options=options)
-    # driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=options)
-    # 隐性等待时间
-    driver.implicitly_wait(4)
-    # 删除所有的cookies
-    driver.delete_all_cookies()
-    # 最大化窗口
-    driver.maximize_window()
-    return driver
+# from playwright.sync_api import sync_playwright
+# from common.playwrightFunction import browser
+from datetime import datetime, timedelta
+from sqlite3 import Date
 
-if __name__ == '__main__':
-    driver = chrome_driver_config()
-    url = "https://bss-front-uat.sixents.com"
-    username = 'test'
-    password = 'liufentest123'
-    duration = 1
-    active = 1
-    bind = 1
-    sum = 1
+from dateutil.relativedelta import relativedelta
+from common.playwrightFunction import client_login
 
-    LoginPage().login(driver, url, username, password)
-    ClientLiQingDetailPage().purchaseLiQing(driver, active, bind, duration, sum)
-
+# def browsers(sss):
+#     browser = sss.chromium.launch(headless=False, args=["--start-maximized"])
+#     context = browser.new_context(no_viewport=True)
+#     page = context.new_page()
+#     return page
+#
+#
+# if __name__ == '__main__':
+#     with sync_playwright() as p:
+#         page = browsers(p)
+#         page.goto("https://bss-front-uat.sixents.com")
+#         page.click('//a[contains(text(),"登录")]')
+#         page.fill('//input[@placeholder="请输入账号或手机号码"]', "18322369885")
+#         page.fill('//input[@placeholder="请输入密码"]', "YANGyang022")
+#         page.click('//button[@type="submit"]')
+#
+# page = browser()
+# page.goto("https://bss-front-uat.sixents.com")
+# page.click('//a[contains(text(),"登录")]')
+# page.fill('//input[@placeholder="请输入账号或手机号码"]', "18322369885")
+# page.fill('//input[@placeholder="请输入密码"]', "YANGyang022")
+# page.click('//button[@type="submit"]')
+# sleep(5)
+# times = "2023-10-23 14:43:31"
+# oo = "2023-10-23 14:41:30"
+# print((datetime.strptime(times, "%Y-%m-%d %H:%M:%S") + timeplus).replace(hour=23, minute=59, second=59))
+# print(datetime.strptime(times, "%Y-%m-%d %H:%M:%S").replace(hour=23, minute=59, second=59))
+# TruthActiveTime = datetime.strptime(times, "%Y-%m-%d %H:%M:%S").replace(microsecond=0, second=0)
+# ss = datetime.strptime(oo, "%Y-%m-%d %H:%M:%S").replace(microsecond=0, second=0)
+# if TruthActiveTime == ss:
+#     print()
+# else:
+#     NotADirectoryError
+print(Date.now())

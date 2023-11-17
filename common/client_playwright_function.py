@@ -7,7 +7,9 @@ import re
 import allure
 import random
 from time import sleep
+from datetime import datetime
 from base.ClientHomeBase import HomeBase
+from dateutil.relativedelta import relativedelta
 from base.ClientLeftNavigationBar import ClientLeftNavigationBar
 from common.playwrightFunction import click_step, fill_step, write_log_to_allure, screenshot_to_allure, client_login
 
@@ -116,6 +118,7 @@ def get_server_number_password(page, servernumber: str, productName: str = '1'):
         click_step(page=page, describe='选择产品为：星璨', position="//li[text()=' 星璨/Orion ']")
     fill_step(page=page, describe='输入差分账号进行查询', position="//label[@title='差分账号']/../following-sibling::div//input", number=servernumber)
     click_step(page=page, describe='点击查询按钮进行查询差分账号', position="//span[text()='查 询']")
+    sleep(3)
     page.wait_for_selector(f"//td[text()='{servernumber}']")
     click_step(page=page, describe='点击查看按钮，查看差分账号密码', position=f"//td[text()='{servernumber}']/../td[6]/a[2]")
     password = page.query_selector("//div[@role='tooltip']").text_content()
@@ -163,3 +166,39 @@ def serach_instance_AK_AS(page, servernumber, productName: str = '1'):
         write_log_to_allure(f'实例的AK为：{AS}')
         screenshot_to_allure(page, name=f'实例的AS截图')
     return AK, AS
+
+
+def auth_active_and_expire_time(page, servernumber, activetime):
+    '''
+    验证差分账号的激活时间和过期时间的正确性
+    @param page: 驱动
+    @param servernumber: 差分账号
+    @param activetime: 正确的激活时间
+    @return:
+    '''
+    with allure.step(f'等待页面差分账号{servernumber}出现'):
+        page.wait_for_selector(f"//td[text()='{servernumber}']")
+    with allure.step(f'获取差分账号{servernumber}的购买时长、激活时间、到期时间'):
+        Duration = page.query_selector(f"//td[text()='{servernumber}']/following-sibling::td[4]/span").text_content()
+        PageActiveTime = page.query_selector(f"//td[text()='{servernumber}']/following-sibling::td[5]").text_content()
+        PageExpireTime = page.query_selector(f"//td[text()='{servernumber}']/following-sibling::td[6]/span").text_content()
+        write_log_to_allure(f'差分账号{servernumber}的购 买时长为：{Duration}\r\n激活时间为：{PageActiveTime}\r\n到期时间为：{PageExpireTime}')
+        screenshot_to_allure(page, name=f'获取差分账号{servernumber}的购买时长、激活时间、到期时间')
+    with allure.step(f'验证激活和过期时间的正确性'):
+        TruthActiveTime = datetime.strptime(activetime, "%Y-%m-%d %H:%M:%S").replace(microsecond=0, second=0)
+        PageActiveTime = datetime.strptime(PageActiveTime, "%Y-%m-%d %H:%M:%S").replace(microsecond=0, second=0)
+        print('1.', TruthActiveTime, PageActiveTime)
+        if TruthActiveTime == PageActiveTime:
+            if Duration[-1] == '月':
+                TruthExpireTime = (PageActiveTime + relativedelta(months=int(Duration[0:-1]))).replace(hour=23, minute=59, second=59)
+            elif Duration[-1] == '天':
+                TruthExpireTime = (PageActiveTime + relativedelta(days=int(Duration[0:-1]))).replace(hour=23, minute=59, second=59)
+            else:
+                raise Exception("该差分账号无过期时间")
+            print('2.', TruthExpireTime, PageExpireTime)
+            if TruthExpireTime == datetime.strptime(PageExpireTime, "%Y-%m-%d %H:%M:%S"):
+                return True
+            else:
+                return False
+        else:
+            return False

@@ -11,7 +11,8 @@ if os.path.exists('./logs/log'):
     shutil.rmtree('./logs/log')
 
 # pytest主函数
-pytest.main(['-s', '-vs', '--reruns=2', './testcases', '-n=2', '--capture=sys', '--alluredir=./result/', '--html=./result/report.html', '--self-contained-html'])
+pytest.main(['-s', '-vs', './testcases', '--capture=sys', '--alluredir=./result/', '--html=./result/report.html', '--self-contained-html'])
+# pytest.main(['-s', '-vs', '--reruns=2', './testcases', '-n=2', '--capture=sys', '--alluredir=./result/', '--html=./result/report.html', '--self-contained-html'])
 # 直接执行allure服务
 # os.system('allure serve ./result/')
 

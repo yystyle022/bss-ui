@@ -194,7 +194,7 @@ def client_login(page):
         page.click('//button[@type="submit"]')
         write_log_to_allure(f'点击页面登录按钮，进行登录')
         screenshot_to_allure(page, '点击登录按钮')
-        sleep(1)
+        sleep(2)
 
     with allure.step('获取登录页面滑块验证信息'):
         download_images(page, image_name="slider", frame_xpath="//iframe[@id='tcaptcha_iframe']", image_xpath="//img[@id='slideBlock']", save_directory='picture')
@@ -208,19 +208,21 @@ def client_login(page):
         write_log_to_allure(f'开始计算滑块滑动数据，滑动的距离列表为{distance}')
 
     with allure.step('滑动滑块验证'):
+        timeout = 10000
+        startTime = datetime.now()
         page.mouse.move(x, y)
         page.mouse.down()
-        sleep(0.2)
         for i in distance:
             x = x + i
             page.mouse.move(x, y)
+            sleep(0.05)
         page.mouse.up()
         write_log_to_allure('开始移动滑块进行验证')
         screenshot_to_allure(page, '滑动滑块验证')
-        sleep(2)
+        sleep(4)
 
     with allure.step('验证是否登录成功'):
-        assert_element_exist(page, "//a[contains(text(),'控制台')]")
+        page.wait_for_selector("//a[contains(text(),'控制台')]", timeout=20)
         write_log_to_allure('控制台元素存在，登录成功，进入首页')
         screenshot_to_allure(page, '验证是否登录成功')
 
@@ -428,7 +430,7 @@ def management_login_fail_server_number_no_exist(page):
         page.click('//button[@type="submit"]')
         write_log_to_allure('点击登录按钮,进行登录')
         screenshot_to_allure(page, '点击登录按钮')
-        sleep(2)
+        sleep(1)
 
     with allure.step('验证是否登录失败-账号不存在'):
         assert_element_exist(page, "//span[text()='该账号不存在 ']")
@@ -601,12 +603,14 @@ def expand_server_number(page, instanceId='9871524', duration=2, sums='5'):
         page.fill("//input[@placeholder='请输入']", instanceId)
         write_log_to_allure(f'输入实例Id:{instanceId}')
         screenshot_to_allure(page, f'输入实例Id:{instanceId}')
+        sleep(2)
 
     with allure.step('点击查询按钮进行实例查询'):
         page.click("//button[1]")
+        sleep(5)
+        page.click("//button[1]")
         write_log_to_allure('点击查询按钮进行查询')
         screenshot_to_allure(page, '点击查询按钮进行查询')
-        sleep(2)
 
     with allure.step('获取扩容前实例下差分账号个数'):
         number1 = page.query_selector("//td[text()='9871524']/following-sibling::td[7]").text_content()
@@ -947,6 +951,7 @@ def review_online_order_application(page, OrderNumber):
     fill_step(page=page, describe='输入审核备注信息：UI测试订单', position="//textarea", number='UI测试订单')
     click_step(page=page, describe=f'点击提交按钮', position="//span[text()='提 交']")
     assert_step(page=page, describe='查看【操作成功】toast提示是否存在', element="//span[text()='操作成功']")
+    return page.query_selector(f"//td[text()='{OrderNumber}']/following-sibling::td[13]").text_content()
 
 
 def get_server_number(page, ReviewOrderNumber: str, OrderType: str = '1'):

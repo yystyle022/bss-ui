@@ -23,10 +23,11 @@ mysql:
     password: vGT&MVC2h3A6@MLP
     datebase: bss
 
-
 redis:
   host: 192.168.0.104
   port: 6379
   db: 0
 
 GGA: $GPGGA,025006.78,4007.5533880,N,11627.9528726,E,1,00,1.0,109.077,M,-9.077,M,0.0,*54
+
+headless: True
